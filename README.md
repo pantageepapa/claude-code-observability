@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Claude Code Setup Viewer
 
-## Getting Started
+A read-only local dashboard that shows what your Claude Code session actually sees: which `CLAUDE.md` files are active and which skills are loaded, split into **user-scope** (`~/.claude/`) and **project-scope** (per-project and ancestor `.claude/` directories).
 
-First, run the development server:
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
+# open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The dashboard reads from your real `~/.claude/` and from the project shown in the top-right dropdown. Default project = the dev server's cwd. Switch projects via the dropdown to see how the picture changes.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What you get in v1
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Active CLAUDE.md** panel — every CLAUDE.md the agent would resolve from `~/.claude/`, `~/.claude/rules/*.md`, the auto-memory index, plus every `CLAUDE.md` and `.claude/CLAUDE.md` from the selected project up the tree to `~`. Click a row to see a 500-char preview.
+- **Skills** panel — user-scope skills from `~/.claude/skills/`, plugin skills from `~/.claude/plugins/cache/*/*/*/skills/`, and project-scope skills from every `.claude/skills/` directory between the selected project and `~`. Filter by scope, search by name/description.
+- **Project switcher** — every project under `~/.claude/projects/`, with the encoded path → real path resolved by trying every plausible decoding (handles ambiguous `-` vs `/` from the encoding).
 
-## Learn More
+## Out of scope (deferred)
 
-To learn more about Next.js, take a look at the following resources:
+- MCP servers, plugins (as their own panel), hooks, `settings.json` — when these are added, secret redaction becomes mandatory because `~/.claude/settings.json` ships with live tokens.
+- Editing anything. v1 is read-only.
+- Live file watching. The page refetches on each navigation; click the project dropdown again or refresh to rescan.
+- Per-skill drill-in pages. Cards show only the frontmatter description.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Limitations to be aware of
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Bundled skills are not visible.** Skills shipped inside the Claude Code binary itself (e.g. `simplify`, `loop` when not present on disk) won't appear unless they exist in the directories scanned above.
+- **Dangling symlinks are skipped.** Many `~/.claude/skills/<name>/SKILL.md` files are symlinks into a `gstack/` subdir that may have moved. Those entries are silently dropped rather than crashing the scan.
 
-## Deploy on Vercel
+## Architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Single-process Next.js 16 (App Router). All filesystem reads happen in Server Components — the browser never touches `fs`. No database. No client state beyond the search/filter UI. See `lib/scan/` for the discovery logic and `app/page.tsx` for orchestration.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  page.tsx              # dashboard (RSC, runs all scans in parallel)
+  layout.tsx            # global shell
+lib/
+  paths.ts              # ~/.claude resolution + project encoding
+  scan/
+    claudeMd.ts         # cascade resolver (user → ancestors → memory)
+    skills.ts           # SKILL.md frontmatter + symlink + plugin glob
+    projects.ts         # decodes ~/.claude/projects/* names
+components/
+  ScopeBadge.tsx        # 🟦 user / 🟩 project chips
+  SkillCard.tsx
+  SkillsGrid.tsx        # client-side filter + search
+  ClaudeMdPanel.tsx
+  ProjectSwitcher.tsx
+```
