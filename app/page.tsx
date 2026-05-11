@@ -3,10 +3,12 @@ import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
+import { scanAgents } from "@/lib/scan/agents";
 import { listProjects } from "@/lib/scan/projects";
 import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
+import { AgentsPanel } from "@/components/AgentsPanel";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
 import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 
@@ -20,9 +22,10 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, rawSkills, projects, healthChecks] = await Promise.all([
+  const [claudeMd, rawSkills, agents, projects, healthChecks] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
+    scanAgents(absolute),
     listProjects(),
     runAllChecks(absolute),
   ]);
@@ -39,6 +42,12 @@ export default async function Home({ searchParams }: PageProps) {
   ).length;
   const pluginSkillsCount = skills.filter((s) => s.source === "plugin").length;
   const projectSkillsCount = skills.filter((s) => s.scope === "project").length;
+
+  const userAgentsCount = agents.filter(
+    (a) => a.scope === "user" && a.source !== "plugin",
+  ).length;
+  const pluginAgentsCount = agents.filter((a) => a.source === "plugin").length;
+  const projectAgentsCount = agents.filter((a) => a.scope === "project").length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -81,6 +90,20 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <SkillsGrid skills={skills} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Subagents
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {agents.length === 0
+              ? "none configured"
+              : `${userAgentsCount} user · ${pluginAgentsCount} plugin · ${projectAgentsCount} project`}
+          </span>
+        </div>
+        <AgentsPanel agents={agents} />
       </section>
 
       <footer className="mt-16 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">

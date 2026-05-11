@@ -31,6 +31,19 @@ export interface ProjectEntry {
   exists: boolean;
 }
 
+export interface Subagent {
+  name: string;
+  description: string;
+  scope: Scope;
+  source: "user" | "project" | "plugin";
+  pluginName?: string;
+  tools?: string[] | "*";
+  model?: string;
+  path: string;
+  id: string;
+  mtime: string | null;
+}
+
 export interface DashboardData {
   currentProject: string;
   currentProjectEncoded: string;
