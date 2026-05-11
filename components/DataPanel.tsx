@@ -12,7 +12,9 @@ interface DataPanelRowProps {
   href?: string;
   badge?: { scope: Scope; subtag?: string };
   title: string;
+  titleMono?: boolean;
   subtitle?: string;
+  subtitleMono?: boolean;
   meta?: MetaItem[];
   dim?: boolean;
 }
@@ -21,7 +23,9 @@ function DataPanelRow({
   href,
   badge,
   title,
+  titleMono,
   subtitle,
+  subtitleMono = true,
   meta,
   dim,
 }: DataPanelRowProps) {
@@ -31,11 +35,11 @@ function DataPanelRow({
     >
       {badge && <ScopeBadge scope={badge.scope} subtag={badge.subtag} />}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
+        <span className={`truncate text-sm font-medium text-zinc-900 dark:text-zinc-100${titleMono ? " font-mono" : ""}`}>
           {title}
         </span>
         {subtitle && (
-          <span className="truncate font-mono text-xs text-zinc-500 dark:text-zinc-500">
+          <span className={`truncate text-xs text-zinc-500 dark:text-zinc-500${subtitleMono ? " font-mono" : ""}`}>
             {subtitle}
           </span>
         )}
