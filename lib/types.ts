@@ -38,3 +38,32 @@ export interface DashboardData {
   claudeMd: ClaudeMdEntry[];
   skills: Skill[];
 }
+
+export type PermissionMode = "allow" | "deny" | "ask";
+
+export interface Permission {
+  pattern: string;
+  mode: PermissionMode;
+  /** Tildify'd path of the settings file that contributes this rule. */
+  sourceFile: string;
+  scope: Scope;
+  /** How many other source files also define this same pattern (0 = unique). */
+  overridesCount: number;
+}
+
+export type DefaultMode = "default" | "acceptEdits" | "auto" | "plan";
+
+export interface SettingsParseError {
+  sourceFile: string;
+  scope: Scope;
+  error: string;
+}
+
+export interface SettingsAudit {
+  permissions: Permission[];
+  defaultMode: DefaultMode | null;
+  /** Key names from the env block — values are never read or surfaced. */
+  envKeyNames: string[];
+  additionalDirectories: string[];
+  parseErrors: SettingsParseError[];
+}
