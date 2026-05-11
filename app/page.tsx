@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { resolveProject, tildify } from "@/lib/paths";
+import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
 import { listProjects } from "@/lib/scan/projects";
@@ -17,11 +18,17 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, skills, projects] = await Promise.all([
+  const [claudeMd, rawSkills, projects] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
     listProjects(),
   ]);
+
+  // Pre-encode hrefs server-side so client components don't need Node's Buffer.
+  const skills = rawSkills.map((s) => ({
+    ...s,
+    href: `/skills/${encodePath(s.path)}`,
+  }));
 
   const presentClaudeMd = claudeMd.filter((e) => e.exists).length;
   const userSkillsCount = skills.filter(

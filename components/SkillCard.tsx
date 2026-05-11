@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Skill } from "@/lib/types";
 import { ScopeBadge } from "./ScopeBadge";
 
@@ -18,7 +19,7 @@ export function SkillCard({ skill }: SkillCardProps) {
         ? "symlinked"
         : undefined;
 
-  return (
+  const inner = (
     <div className="group flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-3 transition hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700">
       <div className="flex items-start justify-between gap-2">
         <h3 className="truncate font-mono text-sm font-medium text-zinc-900 dark:text-zinc-100">
@@ -33,4 +34,13 @@ export function SkillCard({ skill }: SkillCardProps) {
       </p>
     </div>
   );
+
+  if (skill.href) {
+    return (
+      <Link href={skill.href} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded-lg">
+        {inner}
+      </Link>
+    );
+  }
+  return inner;
 }
