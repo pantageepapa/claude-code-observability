@@ -4,9 +4,11 @@ import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
 import { listProjects } from "@/lib/scan/projects";
+import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
+import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +20,11 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, rawSkills, projects] = await Promise.all([
+  const [claudeMd, rawSkills, projects, healthChecks] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
     listProjects(),
+    runAllChecks(absolute),
   ]);
 
   // Pre-encode hrefs server-side so client components don't need Node's Buffer.
@@ -47,6 +50,9 @@ export default async function Home({ searchParams }: PageProps) {
           <p className="mt-1 font-mono text-xs text-zinc-500">
             {tildify(absolute)}
           </p>
+          <Suspense fallback={null}>
+            <HealthSummaryLink checks={healthChecks} projectEncoded={encoded} />
+          </Suspense>
         </div>
         <Suspense fallback={null}>
           <ProjectSwitcher projects={projects} currentEncoded={encoded} />
