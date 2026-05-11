@@ -80,18 +80,6 @@ export default async function Home({ searchParams }: PageProps) {
       <section className="mb-10">
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            Hooks
-          </h2>
-          <span className="text-xs text-zinc-500">
-            {userHooksCount} user · {projectHooksCount} project
-          </span>
-        </div>
-        <HooksPanel hooks={hooks} />
-      </section>
-
-      <section className="mb-10">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
             Skills
           </h2>
           <span className="text-xs text-zinc-500">
@@ -99,6 +87,18 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <SkillsGrid skills={skills} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Hooks
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {userHooksCount} user · {projectHooksCount} project
+          </span>
+        </div>
+        <HooksPanel hooks={hooks} />
       </section>
 
       <footer className="mt-16 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">
