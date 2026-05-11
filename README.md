@@ -4,8 +4,6 @@ A read-only local dashboard that shows exactly what your Claude Code session see
 
 ![Dashboard screenshot](docs/screenshot.png)
 
-> **Note:** the image above is a placeholder. A real screenshot will be added before the first public release.
-
 ## Quick start
 
 ```bash
