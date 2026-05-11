@@ -31,12 +31,23 @@ export interface ProjectEntry {
   exists: boolean;
 }
 
+export interface HookEntry {
+  event: string;
+  matcher?: string;
+  command: string;
+  timeout?: number;
+  sourcePath: string;
+  scope: Scope;
+  source: "user" | "project" | "plugin";
+}
+
 export interface DashboardData {
   currentProject: string;
   currentProjectEncoded: string;
   projects: ProjectEntry[];
   claudeMd: ClaudeMdEntry[];
   skills: Skill[];
+  hooks: HookEntry[];
 }
 
 export type PermissionMode = "allow" | "deny" | "ask";

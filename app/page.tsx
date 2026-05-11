@@ -3,10 +3,12 @@ import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
+import { scanHooks } from "@/lib/scan/hooks";
 import { scanSettings } from "@/lib/scan/settings";
 import { listProjects } from "@/lib/scan/projects";
 import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
+import { HooksPanel } from "@/components/HooksPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
@@ -22,11 +24,12 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, rawSkills, projects, healthChecks, settingsAudit] = await Promise.all([
+  const [claudeMd, rawSkills, projects, healthChecks, hooks, settingsAudit] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
     listProjects(),
     runAllChecks(absolute),
+    scanHooks(absolute),
     scanSettings(absolute),
   ]);
 
@@ -42,6 +45,9 @@ export default async function Home({ searchParams }: PageProps) {
   ).length;
   const pluginSkillsCount = skills.filter((s) => s.source === "plugin").length;
   const projectSkillsCount = skills.filter((s) => s.scope === "project").length;
+
+  const userHooksCount = hooks.filter((h) => h.scope === "user").length;
+  const projectHooksCount = hooks.filter((h) => h.scope === "project").length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -84,6 +90,18 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <SkillsGrid skills={skills} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Hooks
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {userHooksCount} user · {projectHooksCount} project
+          </span>
+        </div>
+        <HooksPanel hooks={hooks} />
       </section>
 
       <section className="mb-10">
