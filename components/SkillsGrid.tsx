@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { Skill } from "@/lib/types";
-import { SkillCard } from "./SkillCard";
+import { formatRelative } from "@/lib/format";
+import { DataPanel } from "./DataPanel";
 
 interface SkillsGridProps {
   skills: Skill[];
@@ -68,11 +69,32 @@ export function SkillsGrid({ skills }: SkillsGridProps) {
           No skills match.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((skill) => (
-            <SkillCard key={`${skill.scope}-${skill.path}`} skill={skill} />
-          ))}
-        </div>
+        <DataPanel>
+          {filtered.map((skill) => {
+            const sourceTag =
+              skill.source === "plugin" && skill.pluginName
+                ? `via ${skill.pluginName.split("@")[0]}`
+                : skill.source === "symlink"
+                  ? "symlinked"
+                  : undefined;
+            const mtime = formatRelative(skill.mtime);
+            const meta: { text: string; mono?: boolean }[] = [];
+            if (sourceTag) meta.push({ text: sourceTag, mono: true });
+            if (mtime) meta.push({ text: mtime });
+            return (
+              <DataPanel.Row
+                key={`${skill.scope}-${skill.path}`}
+                href={skill.href}
+                badge={{ scope: skill.scope }}
+                title={skill.name}
+                titleMono
+                subtitle={skill.description || undefined}
+                subtitleMono={false}
+                meta={meta.length > 0 ? meta : undefined}
+              />
+            );
+          })}
+        </DataPanel>
       )}
     </div>
   );
