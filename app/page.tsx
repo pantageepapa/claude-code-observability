@@ -3,10 +3,12 @@ import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
+import { scanMemory } from "@/lib/scan/memory";
 import { listProjects } from "@/lib/scan/projects";
 import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
+import { MemoryPanel } from "@/components/MemoryPanel";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
 import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 
@@ -20,11 +22,12 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, rawSkills, projects, healthChecks] = await Promise.all([
+  const [claudeMd, rawSkills, projects, healthChecks, memories] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
     listProjects(),
     runAllChecks(absolute),
+    scanMemory(absolute),
   ]);
 
   // Pre-encode hrefs server-side so client components don't need Node's Buffer.
@@ -39,6 +42,11 @@ export default async function Home({ searchParams }: PageProps) {
   ).length;
   const pluginSkillsCount = skills.filter((s) => s.source === "plugin").length;
   const projectSkillsCount = skills.filter((s) => s.scope === "project").length;
+
+  const memoryUserCount = memories.filter((m) => m.memoryType === "user").length;
+  const memoryFeedbackCount = memories.filter((m) => m.memoryType === "feedback").length;
+  const memoryProjectCount = memories.filter((m) => m.memoryType === "project").length;
+  const memoryReferenceCount = memories.filter((m) => m.memoryType === "reference").length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -81,6 +89,18 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <SkillsGrid skills={skills} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Memory
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {memoryUserCount} user · {memoryFeedbackCount} feedback · {memoryProjectCount} project · {memoryReferenceCount} reference
+          </span>
+        </div>
+        <MemoryPanel memories={memories} />
       </section>
 
       <footer className="mt-16 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">

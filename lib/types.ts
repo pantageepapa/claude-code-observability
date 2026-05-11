@@ -31,6 +31,17 @@ export interface ProjectEntry {
   exists: boolean;
 }
 
+export interface Memory {
+  name: string;
+  description: string;
+  memoryType: "user" | "feedback" | "project" | "reference";
+  path: string;
+  id: string;
+  mtime: string | null;
+  preview: string;
+  isIndex: boolean;
+}
+
 export interface DashboardData {
   currentProject: string;
   currentProjectEncoded: string;
