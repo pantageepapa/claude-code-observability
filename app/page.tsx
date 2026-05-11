@@ -3,10 +3,12 @@ import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
+import { scanMcpServers } from "@/lib/scan/mcp";
 import { listProjects } from "@/lib/scan/projects";
 import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
+import { McpPanel } from "@/components/McpPanel";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
 import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 
@@ -20,9 +22,10 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, rawSkills, projects, healthChecks] = await Promise.all([
+  const [claudeMd, rawSkills, mcpServers, projects, healthChecks] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
+    scanMcpServers(absolute),
     listProjects(),
     runAllChecks(absolute),
   ]);
@@ -81,6 +84,18 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <SkillsGrid skills={skills} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            MCP Servers
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {mcpServers.length} configured
+          </span>
+        </div>
+        <McpPanel servers={mcpServers} />
       </section>
 
       <footer className="mt-16 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">
