@@ -71,23 +71,26 @@ export function SkillsGrid({ skills }: SkillsGridProps) {
       ) : (
         <DataPanel>
           {filtered.map((skill) => {
-            const subtag =
+            const sourceTag =
               skill.source === "plugin" && skill.pluginName
                 ? `via ${skill.pluginName.split("@")[0]}`
                 : skill.source === "symlink"
                   ? "symlinked"
                   : undefined;
             const mtime = formatRelative(skill.mtime);
+            const meta: { text: string; mono?: boolean }[] = [];
+            if (sourceTag) meta.push({ text: sourceTag, mono: true });
+            if (mtime) meta.push({ text: mtime });
             return (
               <DataPanel.Row
                 key={`${skill.scope}-${skill.path}`}
                 href={skill.href}
-                badge={{ scope: skill.scope, subtag }}
+                badge={{ scope: skill.scope }}
                 title={skill.name}
                 titleMono
                 subtitle={skill.description || undefined}
                 subtitleMono={false}
-                meta={mtime ? [{ text: mtime }] : undefined}
+                meta={meta.length > 0 ? meta : undefined}
               />
             );
           })}
