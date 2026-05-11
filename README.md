@@ -2,7 +2,7 @@
 
 A read-only local dashboard that shows exactly what your Claude Code session sees — which `CLAUDE.md` files are active, which skills are loaded, and whether your setup passes basic health checks.
 
-![Dashboard screenshot (placeholder — will be replaced before ship)](docs/screenshot.png)
+![Dashboard screenshot](docs/screenshot.png)
 
 > **Note:** the image above is a placeholder. A real screenshot will be added before the first public release.
 
