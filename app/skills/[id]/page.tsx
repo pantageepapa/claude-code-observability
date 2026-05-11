@@ -2,11 +2,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import { notFound } from "next/navigation";
-import { decodePath, validateScannablePath } from "@/lib/encode";
+import { decodePath, encodePath, validateScannablePath } from "@/lib/encode";
 import { scanSkills } from "@/lib/scan/skills";
 import { resolveProject, tildify } from "@/lib/paths";
 import { ScopeBadge } from "@/components/ScopeBadge";
-import { MarkdownView } from "@/components/MarkdownView";
+import { MarkdownEditor } from "@/components/MarkdownEditor";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -99,13 +99,10 @@ export default async function SkillDetailPage({ params }: PageProps) {
         )}
       </header>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-        {body ? (
-          <MarkdownView body={body} />
-        ) : (
-          <p className="text-sm italic text-zinc-400">No content.</p>
-        )}
-      </div>
+      <MarkdownEditor
+        initialContent={body}
+        encodedPath={encodePath(skillMdPath)}
+      />
     </div>
   );
 }
