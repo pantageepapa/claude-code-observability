@@ -16,7 +16,7 @@ pnpm setup
 
 Then open <http://localhost:3000>.
 
-That's it. `pnpm setup` runs `corepack enable && pnpm install && pnpm dev` in one step.
+That's it. `pnpm setup` runs `corepack enable && pnpm install && pnpm build && pnpm start` in one step — a production build, so the dashboard loads instantly (no on-demand compilation).
 
 ## Prerequisites
 
