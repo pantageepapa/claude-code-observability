@@ -4,11 +4,13 @@ import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
 import { scanHooks } from "@/lib/scan/hooks";
+import { scanSettings } from "@/lib/scan/settings";
 import { listProjects } from "@/lib/scan/projects";
 import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { HooksPanel } from "@/components/HooksPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
+import { SettingsPanel } from "@/components/SettingsPanel";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
 import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 
@@ -22,12 +24,13 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, rawSkills, projects, healthChecks, hooks] = await Promise.all([
+  const [claudeMd, rawSkills, projects, healthChecks, hooks, settingsAudit] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
     listProjects(),
     runAllChecks(absolute),
     scanHooks(absolute),
+    scanSettings(absolute),
   ]);
 
   // Pre-encode hrefs server-side so client components don't need Node's Buffer.
@@ -99,6 +102,18 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <HooksPanel hooks={hooks} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Permissions &amp; Settings
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {settingsAudit.permissions.length} rule{settingsAudit.permissions.length !== 1 ? "s" : ""}
+          </span>
+        </div>
+        <SettingsPanel audit={settingsAudit} />
       </section>
 
       <footer className="mt-16 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">
