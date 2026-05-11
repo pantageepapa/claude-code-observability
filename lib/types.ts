@@ -19,6 +19,7 @@ export interface Skill {
   pluginName?: string;
   symlinkTarget?: string;
   path: string;
+  mtime: string | null;
   /** Pre-encoded href for the detail page, computed server-side. */
   href?: string;
 }

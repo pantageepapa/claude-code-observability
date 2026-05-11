@@ -68,6 +68,14 @@ async function readSkillsInDir(
       }
     }
 
+    let mtime: string | null = null;
+    try {
+      const skillStat = await fs.stat(skillMdPath);
+      mtime = skillStat.mtime.toISOString();
+    } catch {
+      // leave null
+    }
+
     out.push({
       name: parsed.name,
       description: parsed.description,
@@ -76,6 +84,7 @@ async function readSkillsInDir(
       pluginName,
       symlinkTarget,
       path: dir,
+      mtime,
     });
   }
   return out;
