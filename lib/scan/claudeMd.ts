@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { CLAUDE_DIR, RULES_DIR, PROJECTS_DIR, encodeProjectPath, tildify, ancestorDirs, HOME } from "../paths";
+import { CLAUDE_DIR, RULES_DIR, tildify, ancestorDirs, HOME } from "../paths";
 import type { ClaudeMdEntry } from "../types";
 
 const PREVIEW_CHARS = 500;
@@ -71,11 +71,6 @@ export async function scanClaudeMd(projectAbsolute: string): Promise<ClaudeMdEnt
       ),
     );
   }
-
-  // 4. Auto-memory MEMORY.md (under encoded project path)
-  const encoded = encodeProjectPath(projectAbsolute);
-  const memoryPath = path.join(PROJECTS_DIR, encoded, "memory", "MEMORY.md");
-  entries.push(await readEntry(memoryPath, "user", "Auto-memory index"));
 
   // Drop non-existent project entries to keep the panel tidy.
   return entries.filter((e) => e.exists || e.scope === "user");
