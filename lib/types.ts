@@ -38,3 +38,20 @@ export interface DashboardData {
   claudeMd: ClaudeMdEntry[];
   skills: Skill[];
 }
+
+export interface SlashCommand {
+  /** Bare filename without extension, e.g. "commit" */
+  name: string;
+  /** Namespace-prefixed name, e.g. "commit-commands:commit" */
+  displayName: string;
+  description: string;
+  scope: Scope;
+  source: "user" | "project" | "plugin";
+  pluginName?: string;
+  path: string;
+  /** Stable identifier: "<source>:<displayName>" */
+  id: string;
+  mtime: string | null;
+  allowedTools?: string[];
+  argumentHint?: string;
+}

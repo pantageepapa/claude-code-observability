@@ -3,10 +3,12 @@ import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
+import { scanCommands } from "@/lib/scan/commands";
 import { listProjects } from "@/lib/scan/projects";
 import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
+import { CommandsPanel } from "@/components/CommandsPanel";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
 import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 
@@ -20,9 +22,10 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const { absolute, encoded } = await resolveProject(params.project);
 
-  const [claudeMd, rawSkills, projects, healthChecks] = await Promise.all([
+  const [claudeMd, rawSkills, commands, projects, healthChecks] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
+    scanCommands(absolute),
     listProjects(),
     runAllChecks(absolute),
   ]);
@@ -39,6 +42,12 @@ export default async function Home({ searchParams }: PageProps) {
   ).length;
   const pluginSkillsCount = skills.filter((s) => s.source === "plugin").length;
   const projectSkillsCount = skills.filter((s) => s.scope === "project").length;
+
+  const userCommandsCount = commands.filter(
+    (c) => c.scope === "user" && c.source !== "plugin",
+  ).length;
+  const pluginCommandsCount = commands.filter((c) => c.source === "plugin").length;
+  const projectCommandsCount = commands.filter((c) => c.scope === "project").length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -81,6 +90,20 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <SkillsGrid skills={skills} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Slash Commands
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {commands.length === 0
+              ? "none"
+              : `${userCommandsCount} user · ${pluginCommandsCount} plugin · ${projectCommandsCount} project`}
+          </span>
+        </div>
+        <CommandsPanel commands={commands} />
       </section>
 
       <footer className="mt-16 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">
