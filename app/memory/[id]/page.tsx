@@ -47,10 +47,10 @@ const TYPE_BADGE_STYLES: Record<
 };
 
 function MemoryTypeBadge({ type }: { type: Memory["memoryType"] }) {
-  const s = TYPE_BADGE_STYLES[type];
+  const { bg, text, ring } = TYPE_BADGE_STYLES[type] ?? TYPE_BADGE_STYLES.reference;
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${s.bg} ${s.text} ${s.ring}`}
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${bg} ${text} ${ring}`}
     >
       {type}
     </span>
@@ -60,12 +60,7 @@ function MemoryTypeBadge({ type }: { type: Memory["memoryType"] }) {
 export default async function MemoryDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  let filePath: string;
-  try {
-    filePath = decodePath(id);
-  } catch {
-    return notFound();
-  }
+  const filePath = decodePath(id);
 
   if (!validateScannablePath(filePath)) {
     return notFound();
@@ -118,9 +113,7 @@ export default async function MemoryDetailPage({ params }: PageProps) {
         )}
       </header>
 
-      <pre className="min-h-[400px] w-full overflow-x-auto rounded-lg border border-zinc-200 bg-white p-4 font-mono text-xs leading-relaxed text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
-        {body}
-      </pre>
+      <pre className="min-h-[400px] w-full overflow-x-auto rounded-lg border border-zinc-200 bg-white p-4 font-mono text-xs leading-relaxed text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">{body}</pre>
     </div>
   );
 }
