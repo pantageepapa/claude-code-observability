@@ -62,7 +62,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   if (!apiKey) {
     return Response.json(
       { error: "ANTHROPIC_API_KEY not configured" },
-      { status: 400 },
+      { status: 503 },
     );
   }
 
@@ -120,7 +120,9 @@ export async function POST(req: NextRequest): Promise<Response> {
   // across turns (only the userMessage changes each turn).
   const fileContextBlock = {
     type: "text",
-    text: `<file path="${realPath}">\n${fileContent}\n</file>`,
+    text: `<file path="${realPath.replace(/"/g, "&quot;")}">
+${fileContent}
+</file>`,
     cache_control: { type: "ephemeral" },
   };
 
@@ -275,11 +277,11 @@ export async function POST(req: NextRequest): Promise<Response> {
             }
           }
         }
+        controller.close();
       } catch (err) {
         controller.error(err);
       } finally {
         reader.releaseLock();
-        controller.close();
       }
     },
   });
