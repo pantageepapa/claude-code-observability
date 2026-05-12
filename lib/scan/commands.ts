@@ -42,6 +42,7 @@ interface CommandFile {
   filePath: string;
   displayName: string;
   name: string;
+  mtime: string;
 }
 
 /**
@@ -79,7 +80,7 @@ async function collectCommandFiles(baseDir: string, relPrefix: string): Promise<
       const bareName = entry.slice(0, -3);
       const namespaceParts = relPrefix ? relPrefix.split("/") : [];
       const displayName = [...namespaceParts, bareName].join(":");
-      out.push({ filePath: full, displayName, name: bareName });
+      out.push({ filePath: full, displayName, name: bareName, mtime: stat.mtime.toISOString() });
     }
   }
   return out;
@@ -94,16 +95,8 @@ async function readCommandsInDir(
   const out: SlashCommand[] = [];
   const files = await collectCommandFiles(commandsDir, "");
 
-  for (const { filePath, displayName, name } of files) {
+  for (const { filePath, displayName, name, mtime } of files) {
     const fm = await parseFrontmatter(filePath);
-
-    let mtime: string | null = null;
-    try {
-      const s = await fs.stat(filePath);
-      mtime = s.mtime.toISOString();
-    } catch {
-      // leave null
-    }
 
     out.push({
       name,
@@ -113,7 +106,7 @@ async function readCommandsInDir(
       source,
       pluginName,
       path: filePath,
-      id: `${source}:${displayName}`,
+      id: `${source}:${scope}:${displayName}`,
       mtime,
       allowedTools: fm.allowedTools,
       argumentHint: fm.argumentHint,
@@ -166,13 +159,13 @@ export async function scanCommands(projectAbsolute: string): Promise<SlashComman
     scanProjectAncestorCommands(projectAbsolute),
   ]);
 
-  // Deduplicate by id. Closest project ancestor wins over farther ancestors;
+  // Deduplicate by displayName. Closest project ancestor wins over farther ancestors;
   // user overrides plugin; project overrides user.
   const byKey = new Map<string, SlashCommand>();
-  for (const c of pluginCommands) byKey.set(c.id, c);
-  for (const c of userCommands) byKey.set(c.id, c);
+  for (const c of pluginCommands) byKey.set(c.displayName, c);
+  for (const c of userCommands) byKey.set(c.displayName, c);
   // projectCommands is cwd-first; reverse so the closest ancestor is set last and wins.
-  for (const c of [...projectCommands].reverse()) byKey.set(c.id, c);
+  for (const c of [...projectCommands].reverse()) byKey.set(c.displayName, c);
 
   return Array.from(byKey.values()).sort((a, b) => {
     if (a.scope !== b.scope) return a.scope === "project" ? -1 : 1;
