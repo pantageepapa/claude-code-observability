@@ -94,8 +94,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     await fs.writeFile(tmpPath, fileContent, "utf-8");
     await fs.rename(tmpPath, skillMdPath);
   } catch (err) {
-    // Best-effort cleanup
+    // Best-effort cleanup of both the temp file and the created directory so a
+    // subsequent attempt doesn't hit the 409 conflict check on an empty dir.
     await fs.unlink(tmpPath).catch(() => undefined);
+    await fs.rmdir(skillDir).catch(() => undefined);
     const message = err instanceof Error ? err.message : "Write failed";
     return NextResponse.json({ error: message }, { status: 500 });
   }
