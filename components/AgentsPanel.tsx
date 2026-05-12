@@ -1,5 +1,3 @@
-"use client";
-
 import type { Subagent } from "@/lib/types";
 import { formatRelative } from "@/lib/format";
 import { DataPanel } from "./DataPanel";
@@ -23,12 +21,14 @@ export function AgentsPanel({ agents }: AgentsPanelProps) {
         </p>
         <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
           Subagents are specialist roles that Claude can delegate tasks to. Each
-          agent is a{" "}
+          agent is a{
+          " "}
           <span className="font-mono">.md</span> file with a YAML frontmatter
           block defining its name, description, and tool access.
         </p>
         <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-500">
-          Add a <span className="font-mono">.md</span> file to{" "}
+          Add a <span className="font-mono">.md</span> file to{
+          " "}
           <span className="font-mono">~/.claude/agents/</span> to create your
           first user-scoped subagent.
         </p>
