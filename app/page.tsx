@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
@@ -15,8 +14,7 @@ import { SkillsGrid } from "@/components/SkillsGrid";
 import { MemoryPanel } from "@/components/MemoryPanel";
 import { McpPanel } from "@/components/McpPanel";
 import { SettingsPanel } from "@/components/SettingsPanel";
-import { ProjectSwitcher } from "@/components/ProjectSwitcher";
-import { HealthSummaryLink } from "@/components/HealthSummaryLink";
+import { HeroCard } from "@/components/HeroCard";
 
 export const dynamic = "force-dynamic";
 
@@ -62,22 +60,13 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Claude Code Setup
-          </h1>
-          <p className="mt-1 font-mono text-xs text-zinc-500">
-            {tildify(absolute)}
-          </p>
-          <Suspense fallback={null}>
-            <HealthSummaryLink checks={healthChecks} projectEncoded={encoded} />
-          </Suspense>
-        </div>
-        <Suspense fallback={null}>
-          <ProjectSwitcher projects={projects} currentEncoded={encoded} />
-        </Suspense>
-      </header>
+      <HeroCard
+        absolute={absolute}
+        tildified={tildify(absolute)}
+        encoded={encoded}
+        healthChecks={healthChecks}
+        projects={projects}
+      />
 
       <section className="mb-10">
         <div className="mb-3 flex items-baseline justify-between">
