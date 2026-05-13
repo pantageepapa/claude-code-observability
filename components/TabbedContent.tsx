@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { TabBar, type TabId, type TabDef } from "./TabBar";
+import { TabBar, VALID_TABS, type TabId, type TabDef } from "./TabBar";
 import { ClaudeMdPanel } from "./ClaudeMdPanel";
 import { MemoryPanel } from "./MemoryPanel";
 import { SkillsGrid } from "./SkillsGrid";
@@ -26,8 +26,6 @@ interface TabbedContentProps {
   knowledgeCount: number;
   settingsCount: number;
 }
-
-const VALID_TABS: TabId[] = ["knowledge", "skills", "settings"];
 
 function isValidTab(value: string | null): value is TabId {
   return VALID_TABS.includes(value as TabId);
@@ -65,6 +63,7 @@ export function TabbedContent({
         id="tabpanel-knowledge"
         aria-labelledby="tab-knowledge"
         hidden={activeTab !== "knowledge"}
+        tabIndex={0}
         className="mt-8"
       >
         <section className="mb-10">
@@ -104,6 +103,7 @@ export function TabbedContent({
         id="tabpanel-skills"
         aria-labelledby="tab-skills"
         hidden={activeTab !== "skills"}
+        tabIndex={0}
         className="mt-8"
       >
         <section className="mb-10">
@@ -129,6 +129,7 @@ export function TabbedContent({
         id="tabpanel-settings"
         aria-labelledby="tab-settings"
         hidden={activeTab !== "settings"}
+        tabIndex={0}
         className="mt-8"
       >
         <section className="mb-10">

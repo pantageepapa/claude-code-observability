@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 export type TabId = "knowledge" | "skills" | "settings";
 
+export const VALID_TABS: TabId[] = ["knowledge", "skills", "settings"];
+
 export interface TabDef {
   id: TabId;
   label: string;

@@ -12,11 +12,9 @@ import { runAllChecks } from "@/lib/health/checks";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
 import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 import { TabbedContent } from "@/components/TabbedContent";
-import type { TabId } from "@/components/TabBar";
+import { VALID_TABS, type TabId } from "@/components/TabBar";
 
 export const dynamic = "force-dynamic";
-
-const VALID_TABS: TabId[] = ["knowledge", "skills", "settings"];
 
 function resolveTab(value: string | undefined): TabId {
   if (value && (VALID_TABS as string[]).includes(value)) return value as TabId;
