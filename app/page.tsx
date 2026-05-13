@@ -1,4 +1,4 @@
-import { resolveProject, tildify } from "@/lib/paths";
+import { resolveProject } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
@@ -62,7 +62,6 @@ export default async function Home({ searchParams }: PageProps) {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <HeroCard
         absolute={absolute}
-        tildified={tildify(absolute)}
         encoded={encoded}
         healthChecks={healthChecks}
         projects={projects}

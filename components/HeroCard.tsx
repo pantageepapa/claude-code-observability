@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import path from "node:path";
+import { tildify } from "@/lib/paths";
 import { HealthSummaryLink } from "@/components/HealthSummaryLink";
 import { ProjectSwitcher } from "@/components/ProjectSwitcher";
 import type { HealthCheck } from "@/lib/health/types";
@@ -7,7 +8,6 @@ import type { ProjectEntry } from "@/lib/types";
 
 interface HeroCardProps {
   absolute: string;
-  tildified: string;
   encoded: string;
   healthChecks: HealthCheck[];
   projects: ProjectEntry[];
@@ -15,12 +15,12 @@ interface HeroCardProps {
 
 export function HeroCard({
   absolute,
-  tildified,
   encoded,
   healthChecks,
   projects,
 }: HeroCardProps) {
   const folderName = path.basename(absolute);
+  const tildified = tildify(absolute);
 
   return (
     <div className="mb-8 rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900">
