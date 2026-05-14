@@ -45,6 +45,7 @@ export default function NewSkillPage() {
   const router = useRouter();
   const [formState, setFormState] = useState<FormState>(initialState);
   const [nameError, setNameError] = useState<string | null>(null);
+  const [descriptionError, setDescriptionError] = useState<string | null>(null);
 
   const validateName = (value: string): string | null => {
     if (value === "") return null; // no error while empty
@@ -63,14 +64,21 @@ export default function NewSkillPage() {
     e.preventDefault();
 
     // Client-side validation
-    if (!NAME_RE.test(formState.name)) {
-      setNameError("Only lowercase letters, digits, and hyphens. Must start with a letter or digit.");
+    const nameErr = formState.name === ""
+      ? "Name is required."
+      : !NAME_RE.test(formState.name)
+        ? "Only lowercase letters, digits, and hyphens. Must start with a letter or digit."
+        : null;
+    if (nameErr) {
+      setNameError(nameErr);
       return;
     }
-    if (!formState.description.trim()) {
-      setFormState((s) => ({ ...s, error: "Description is required." }));
+    const descErr = formState.description.trim() === "" ? "Description is required." : null;
+    if (descErr) {
+      setDescriptionError(descErr);
       return;
     }
+    setDescriptionError(null);
 
     setFormState((s) => ({ ...s, submitting: true, error: null }));
 
@@ -218,11 +226,24 @@ export default function NewSkillPage() {
             id="skill-description"
             type="text"
             value={formState.description}
-            onChange={(e) => setFormState((s) => ({ ...s, description: e.target.value }))}
+            onChange={(e) => {
+              setFormState((s) => ({ ...s, description: e.target.value }));
+              if (descriptionError && e.target.value.trim()) setDescriptionError(null);
+            }}
             placeholder="One-line summary of what this skill does"
             required
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm shadow-sm focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500"
+            aria-describedby={descriptionError ? "description-error" : undefined}
+            className={`w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:outline-none dark:bg-zinc-900 dark:text-zinc-100 ${
+              descriptionError
+                ? "border-red-400 focus:border-red-500 dark:border-red-600"
+                : "border-zinc-300 focus:border-zinc-400 dark:border-zinc-700 dark:focus:border-zinc-500"
+            }`}
           />
+          {descriptionError && (
+            <p id="description-error" className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">
+              {descriptionError}
+            </p>
+          )}
         </div>
 
         {/* Body */}
