@@ -60,7 +60,7 @@ async function readAgentsInDir(
   const out: Subagent[] = [];
   const entries = await safeReaddir(baseDir);
   for (const entry of entries) {
-    if (!entry.endsWith(".md")) continue;
+    if (entry.startsWith(".") || !entry.endsWith(".md")) continue;
     const agentPath = path.join(baseDir, entry);
     let stat;
     try {
