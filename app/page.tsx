@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
@@ -92,13 +93,21 @@ export default async function Home({ searchParams }: PageProps) {
       </section>
 
       <section className="mb-10">
-        <div className="mb-3 flex items-baseline justify-between">
+        <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
             Skills
           </h2>
-          <span className="text-xs text-zinc-500">
-            {userSkillsCount} user · {pluginSkillsCount} plugin · {projectSkillsCount} project
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-500">
+              {userSkillsCount} user · {pluginSkillsCount} plugin · {projectSkillsCount} project
+            </span>
+            <Link
+              href="/skills/new"
+              className="rounded-md border border-zinc-300 bg-white px-2.5 py-1 text-xs font-medium text-zinc-700 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:bg-zinc-800"
+            >
+              + New skill
+            </Link>
+          </div>
         </div>
         <SkillsGrid skills={skills} />
       </section>
