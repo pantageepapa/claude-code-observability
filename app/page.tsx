@@ -5,6 +5,7 @@ import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
 import { scanCommands } from "@/lib/scan/commands";
+import { scanAgents } from "@/lib/scan/agents";
 import { scanMemory } from "@/lib/scan/memory";
 import { scanMcpServers } from "@/lib/scan/mcp";
 import { scanHooks } from "@/lib/scan/hooks";
@@ -15,6 +16,7 @@ import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { HooksPanel } from "@/components/HooksPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
 import { CommandsPanel } from "@/components/CommandsPanel";
+import { AgentsPanel } from "@/components/AgentsPanel";
 import { MemoryPanel } from "@/components/MemoryPanel";
 import { McpPanel } from "@/components/McpPanel";
 import { SettingsPanel } from "@/components/SettingsPanel";
@@ -35,6 +37,7 @@ export default async function Home({ searchParams }: PageProps) {
     claudeMd,
     rawSkills,
     commands,
+    agents,
     mcpServers,
     projects,
     healthChecks,
@@ -45,6 +48,7 @@ export default async function Home({ searchParams }: PageProps) {
     scanClaudeMd(absolute),
     scanSkills(absolute),
     scanCommands(absolute),
+    scanAgents(absolute),
     scanMcpServers(absolute),
     listProjects(),
     runAllChecks(absolute),
@@ -75,6 +79,12 @@ export default async function Home({ searchParams }: PageProps) {
   ).length;
   const pluginCommandsCount = commands.filter((c) => c.source === "plugin").length;
   const projectCommandsCount = commands.filter((c) => c.scope === "project").length;
+
+  const userAgentsCount = agents.filter(
+    (a) => a.scope === "user" && a.source !== "plugin",
+  ).length;
+  const pluginAgentsCount = agents.filter((a) => a.source === "plugin").length;
+  const projectAgentsCount = agents.filter((a) => a.scope === "project").length;
 
   const memoryUserCount = memories.filter((m) => m.memoryType === "user").length;
   const memoryFeedbackCount = memories.filter((m) => m.memoryType === "feedback").length;
@@ -147,6 +157,20 @@ export default async function Home({ searchParams }: PageProps) {
           </span>
         </div>
         <CommandsPanel commands={commandsWithHref} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Subagents
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {agents.length === 0
+              ? "none configured"
+              : `${userAgentsCount} user · ${pluginAgentsCount} plugin · ${projectAgentsCount} project`}
+          </span>
+        </div>
+        <AgentsPanel agents={agents} />
       </section>
 
       <section className="mb-10">
