@@ -35,6 +35,10 @@ export default async function Home({ searchParams }: PageProps) {
     ...s,
     href: `/skills/${encodePath(s.path)}`,
   }));
+  const commandsWithHref = commands.map((c) => ({
+    ...c,
+    href: `/commands/${encodePath(c.path)}`,
+  }));
 
   const presentClaudeMd = claudeMd.filter((e) => e.exists).length;
   const userSkillsCount = skills.filter(
@@ -103,7 +107,7 @@ export default async function Home({ searchParams }: PageProps) {
               : `${userCommandsCount} user · ${pluginCommandsCount} plugin · ${projectCommandsCount} project`}
           </span>
         </div>
-        <CommandsPanel commands={commands} />
+        <CommandsPanel commands={commandsWithHref} />
       </section>
 
       <footer className="mt-16 border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">

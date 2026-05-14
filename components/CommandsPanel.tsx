@@ -28,6 +28,7 @@ export function CommandsPanel({ commands }: CommandsPanelProps) {
         return (
           <DataPanel.Row
             key={cmd.id}
+            href={cmd.href}
             badge={{ scope: cmd.scope }}
             title={cmd.displayName}
             titleMono

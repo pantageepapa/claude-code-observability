@@ -54,4 +54,6 @@ export interface SlashCommand {
   mtime: string | null;
   allowedTools?: string[];
   argumentHint?: string;
+  /** Pre-encoded href for the detail page, computed server-side. */
+  href?: string;
 }
