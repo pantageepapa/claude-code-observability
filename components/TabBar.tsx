@@ -1,11 +1,24 @@
 "use client";
 
 import { useCallback, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
-export type TabId = "knowledge" | "skills" | "settings";
+export type TabId =
+  | "claudemd"
+  | "memory"
+  | "skills"
+  | "mcp"
+  | "hooks"
+  | "permissions";
 
-export const VALID_TABS: TabId[] = ["knowledge", "skills", "settings"];
+export const VALID_TABS: TabId[] = [
+  "claudemd",
+  "memory",
+  "skills",
+  "mcp",
+  "hooks",
+  "permissions",
+];
 
 export interface TabDef {
   id: TabId;
@@ -19,7 +32,6 @@ interface TabBarProps {
 }
 
 export function TabBar({ tabs, activeTab }: TabBarProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -27,9 +39,9 @@ export function TabBar({ tabs, activeTab }: TabBarProps) {
     (tabId: TabId) => {
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", tabId);
-      router.push(`/?${params.toString()}`);
+      window.history.pushState(null, "", `/?${params.toString()}`);
     },
-    [router, searchParams],
+    [searchParams],
   );
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, index: number) {

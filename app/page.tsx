@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 function resolveTab(value: string | undefined): TabId {
   if (value && (VALID_TABS as string[]).includes(value)) return value as TabId;
-  return "knowledge";
+  return "claudemd";
 }
 
 interface PageProps {
@@ -46,13 +46,6 @@ export default async function Home({ searchParams }: PageProps) {
     ...s,
     href: `/skills/${encodePath(s.path)}`,
   }));
-
-  // Count pills for tab bar
-  const skillsCount = skills.length;
-  const knowledgeCount =
-    claudeMd.filter((e) => e.exists).length + memories.length;
-  const settingsCount =
-    mcpServers.length + hooks.length + settingsAudit.permissions.length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -82,9 +75,6 @@ export default async function Home({ searchParams }: PageProps) {
           mcpServers={mcpServers}
           hooks={hooks}
           settingsAudit={settingsAudit}
-          skillsCount={skillsCount}
-          knowledgeCount={knowledgeCount}
-          settingsCount={settingsCount}
         />
       </Suspense>
 

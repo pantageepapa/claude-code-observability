@@ -8,23 +8,23 @@ import { SkillsGrid } from "./SkillsGrid";
 import { McpPanel } from "./McpPanel";
 import { HooksPanel } from "./HooksPanel";
 import { SettingsPanel } from "./SettingsPanel";
-import type { ClaudeMdEntry, Memory, McpServer, HookEntry, SettingsAudit, Skill } from "@/lib/types";
+import type {
+  ClaudeMdEntry,
+  Memory,
+  McpServer,
+  HookEntry,
+  SettingsAudit,
+  Skill,
+} from "@/lib/types";
 
 interface TabbedContentProps {
   initialTab: TabId;
-  // Knowledge tab data
   claudeMd: ClaudeMdEntry[];
   memories: Memory[];
-  // Skills tab data
   skills: Skill[];
-  // Settings tab data
   mcpServers: McpServer[];
   hooks: HookEntry[];
   settingsAudit: SettingsAudit;
-  // Counts for pills
-  skillsCount: number;
-  knowledgeCount: number;
-  settingsCount: number;
 }
 
 function isValidTab(value: string | null): value is TabId {
@@ -39,30 +39,54 @@ export function TabbedContent({
   mcpServers,
   hooks,
   settingsAudit,
-  skillsCount,
-  knowledgeCount,
-  settingsCount,
 }: TabbedContentProps) {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const activeTab: TabId = isValidTab(tabParam) ? tabParam : initialTab;
 
+  const presentClaudeMd = claudeMd.filter((e) => e.exists).length;
+
   const tabs: TabDef[] = [
-    { id: "knowledge", label: "Knowledge", count: knowledgeCount },
-    { id: "skills", label: "Skills", count: skillsCount },
-    { id: "settings", label: "Settings", count: settingsCount },
+    { id: "claudemd", label: "CLAUDE.md", count: presentClaudeMd },
+    { id: "memory", label: "Memory", count: memories.length },
+    { id: "skills", label: "Skills", count: skills.length },
+    { id: "mcp", label: "MCP", count: mcpServers.length },
+    { id: "hooks", label: "Hooks", count: hooks.length },
+    {
+      id: "permissions",
+      label: "Permissions",
+      count: settingsAudit.permissions.length,
+    },
   ];
+
+  const memoryByType = {
+    user: memories.filter((m) => m.memoryType === "user").length,
+    feedback: memories.filter((m) => m.memoryType === "feedback").length,
+    project: memories.filter((m) => m.memoryType === "project").length,
+    reference: memories.filter((m) => m.memoryType === "reference").length,
+  };
+
+  const skillsByScope = {
+    user: skills.filter((s) => s.scope === "user" && s.source !== "plugin")
+      .length,
+    plugin: skills.filter((s) => s.source === "plugin").length,
+    project: skills.filter((s) => s.scope === "project").length,
+  };
+
+  const hooksByScope = {
+    user: hooks.filter((h) => h.scope === "user").length,
+    project: hooks.filter((h) => h.scope === "project").length,
+  };
 
   return (
     <div>
       <TabBar tabs={tabs} activeTab={activeTab} />
 
-      {/* Knowledge tab panel */}
       <div
         role="tabpanel"
-        id="tabpanel-knowledge"
-        aria-labelledby="tab-knowledge"
-        hidden={activeTab !== "knowledge"}
+        id="tabpanel-claudemd"
+        aria-labelledby="tab-claudemd"
+        hidden={activeTab !== "claudemd"}
         tabIndex={0}
         className="mt-8"
       >
@@ -72,32 +96,40 @@ export function TabbedContent({
               Active CLAUDE.md
             </h2>
             <span className="text-xs text-zinc-500">
-              {claudeMd.filter((e) => e.exists).length} of {claudeMd.length} present
+              {presentClaudeMd} of {claudeMd.length} present
             </span>
           </div>
           <ClaudeMdPanel entries={claudeMd} />
         </section>
+      </div>
 
+      <div
+        role="tabpanel"
+        id="tabpanel-memory"
+        aria-labelledby="tab-memory"
+        hidden={activeTab !== "memory"}
+        tabIndex={0}
+        className="mt-8"
+      >
         <section className="mb-10">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
               Memory
             </h2>
             <span className="text-xs text-zinc-500">
-              {memories.filter((m) => m.memoryType === "user").length} user
+              {memoryByType.user} user
               {" · "}
-              {memories.filter((m) => m.memoryType === "feedback").length} feedback
+              {memoryByType.feedback} feedback
               {" · "}
-              {memories.filter((m) => m.memoryType === "project").length} project
+              {memoryByType.project} project
               {" · "}
-              {memories.filter((m) => m.memoryType === "reference").length} reference
+              {memoryByType.reference} reference
             </span>
           </div>
           <MemoryPanel memories={memories} />
         </section>
       </div>
 
-      {/* Skills tab panel */}
       <div
         role="tabpanel"
         id="tabpanel-skills"
@@ -112,23 +144,22 @@ export function TabbedContent({
               Skills
             </h2>
             <span className="text-xs text-zinc-500">
-              {skills.filter((s) => s.scope === "user" && s.source !== "plugin").length} user
+              {skillsByScope.user} user
               {" · "}
-              {skills.filter((s) => s.source === "plugin").length} plugin
+              {skillsByScope.plugin} plugin
               {" · "}
-              {skills.filter((s) => s.scope === "project").length} project
+              {skillsByScope.project} project
             </span>
           </div>
           <SkillsGrid skills={skills} />
         </section>
       </div>
 
-      {/* Settings tab panel */}
       <div
         role="tabpanel"
-        id="tabpanel-settings"
-        aria-labelledby="tab-settings"
-        hidden={activeTab !== "settings"}
+        id="tabpanel-mcp"
+        aria-labelledby="tab-mcp"
+        hidden={activeTab !== "mcp"}
         tabIndex={0}
         className="mt-8"
       >
@@ -143,21 +174,39 @@ export function TabbedContent({
           </div>
           <McpPanel servers={mcpServers} />
         </section>
+      </div>
 
+      <div
+        role="tabpanel"
+        id="tabpanel-hooks"
+        aria-labelledby="tab-hooks"
+        hidden={activeTab !== "hooks"}
+        tabIndex={0}
+        className="mt-8"
+      >
         <section className="mb-10">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
               Hooks
             </h2>
             <span className="text-xs text-zinc-500">
-              {hooks.filter((h) => h.scope === "user").length} user
+              {hooksByScope.user} user
               {" · "}
-              {hooks.filter((h) => h.scope === "project").length} project
+              {hooksByScope.project} project
             </span>
           </div>
           <HooksPanel hooks={hooks} />
         </section>
+      </div>
 
+      <div
+        role="tabpanel"
+        id="tabpanel-permissions"
+        aria-labelledby="tab-permissions"
+        hidden={activeTab !== "permissions"}
+        tabIndex={0}
+        className="mt-8"
+      >
         <section className="mb-10">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
