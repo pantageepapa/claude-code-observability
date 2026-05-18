@@ -3,6 +3,8 @@ import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
+import { scanCommands } from "@/lib/scan/commands";
+import { scanAgents } from "@/lib/scan/agents";
 import { scanMemory } from "@/lib/scan/memory";
 import { scanMcpServers } from "@/lib/scan/mcp";
 import { scanHooks } from "@/lib/scan/hooks";
@@ -30,9 +32,22 @@ export default async function Home({ searchParams }: PageProps) {
   const { absolute, encoded } = await resolveProject(params.project);
   const initialTab = resolveTab(params.tab);
 
-  const [claudeMd, rawSkills, mcpServers, projects, healthChecks, hooks, settingsAudit, memories] = await Promise.all([
+  const [
+    claudeMd,
+    rawSkills,
+    commands,
+    agents,
+    mcpServers,
+    projects,
+    healthChecks,
+    hooks,
+    settingsAudit,
+    memories,
+  ] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
+    scanCommands(absolute),
+    scanAgents(absolute),
     scanMcpServers(absolute),
     listProjects(),
     runAllChecks(absolute),
@@ -45,6 +60,10 @@ export default async function Home({ searchParams }: PageProps) {
   const skills = rawSkills.map((s) => ({
     ...s,
     href: `/skills/${encodePath(s.path)}`,
+  }));
+  const commandsWithHref = commands.map((c) => ({
+    ...c,
+    href: `/commands/${encodePath(c.path)}`,
   }));
 
   return (
@@ -72,6 +91,8 @@ export default async function Home({ searchParams }: PageProps) {
           claudeMd={claudeMd}
           memories={memories}
           skills={skills}
+          commands={commandsWithHref}
+          agents={agents}
           mcpServers={mcpServers}
           hooks={hooks}
           settingsAudit={settingsAudit}

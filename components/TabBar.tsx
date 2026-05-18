@@ -7,6 +7,8 @@ export type TabId =
   | "claudemd"
   | "memory"
   | "skills"
+  | "commands"
+  | "agents"
   | "mcp"
   | "hooks"
   | "permissions";
@@ -15,6 +17,8 @@ export const VALID_TABS: TabId[] = [
   "claudemd",
   "memory",
   "skills",
+  "commands",
+  "agents",
   "mcp",
   "hooks",
   "permissions",
