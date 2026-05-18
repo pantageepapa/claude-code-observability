@@ -4,6 +4,7 @@ import { resolveProject, tildify } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
+import { scanCommands } from "@/lib/scan/commands";
 import { scanAgents } from "@/lib/scan/agents";
 import { scanMemory } from "@/lib/scan/memory";
 import { scanMcpServers } from "@/lib/scan/mcp";
@@ -14,6 +15,7 @@ import { runAllChecks } from "@/lib/health/checks";
 import { ClaudeMdPanel } from "@/components/ClaudeMdPanel";
 import { HooksPanel } from "@/components/HooksPanel";
 import { SkillsGrid } from "@/components/SkillsGrid";
+import { CommandsPanel } from "@/components/CommandsPanel";
 import { AgentsPanel } from "@/components/AgentsPanel";
 import { MemoryPanel } from "@/components/MemoryPanel";
 import { McpPanel } from "@/components/McpPanel";
@@ -34,6 +36,7 @@ export default async function Home({ searchParams }: PageProps) {
   const [
     claudeMd,
     rawSkills,
+    commands,
     agents,
     mcpServers,
     projects,
@@ -44,6 +47,7 @@ export default async function Home({ searchParams }: PageProps) {
   ] = await Promise.all([
     scanClaudeMd(absolute),
     scanSkills(absolute),
+    scanCommands(absolute),
     scanAgents(absolute),
     scanMcpServers(absolute),
     listProjects(),
@@ -58,6 +62,10 @@ export default async function Home({ searchParams }: PageProps) {
     ...s,
     href: `/skills/${encodePath(s.path)}`,
   }));
+  const commandsWithHref = commands.map((c) => ({
+    ...c,
+    href: `/commands/${encodePath(c.path)}`,
+  }));
 
   const presentClaudeMd = claudeMd.filter((e) => e.exists).length;
   const userSkillsCount = skills.filter(
@@ -65,6 +73,12 @@ export default async function Home({ searchParams }: PageProps) {
   ).length;
   const pluginSkillsCount = skills.filter((s) => s.source === "plugin").length;
   const projectSkillsCount = skills.filter((s) => s.scope === "project").length;
+
+  const userCommandsCount = commands.filter(
+    (c) => c.scope === "user" && c.source !== "plugin",
+  ).length;
+  const pluginCommandsCount = commands.filter((c) => c.source === "plugin").length;
+  const projectCommandsCount = commands.filter((c) => c.scope === "project").length;
 
   const userAgentsCount = agents.filter(
     (a) => a.scope === "user" && a.source !== "plugin",
@@ -129,6 +143,20 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         </div>
         <SkillsGrid skills={skills} />
+      </section>
+
+      <section className="mb-10">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Slash Commands
+          </h2>
+          <span className="text-xs text-zinc-500">
+            {commands.length === 0
+              ? "none"
+              : `${userCommandsCount} user · ${pluginCommandsCount} plugin · ${projectCommandsCount} project`}
+          </span>
+        </div>
+        <CommandsPanel commands={commandsWithHref} />
       </section>
 
       <section className="mb-10">
