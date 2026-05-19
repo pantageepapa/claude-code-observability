@@ -3,20 +3,22 @@ import path from "node:path";
 
 const HOME = os.homedir();
 
-/**
- * Encode an absolute file path to a URL-safe base64url string.
- * Reversible and safe to embed in a URL path segment.
- */
+// The browser's Buffer polyfill supports "base64" but not "base64url",
+// so transform manually. This keeps URL output byte-identical to Node's
+// Buffer.toString("base64url") while working in both server and client bundles.
 export function encodePath(absolute: string): string {
-  return Buffer.from(absolute, "utf-8").toString("base64url");
+  return Buffer.from(absolute, "utf-8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
-/**
- * Decode a base64url-encoded path back to the original absolute path.
- * Throws if the encoded string is not valid base64url.
- */
 export function decodePath(encoded: string): string {
-  return Buffer.from(encoded, "base64url").toString("utf-8");
+  const b64 =
+    encoded.replace(/-/g, "+").replace(/_/g, "/") +
+    "===".slice((encoded.length + 3) % 4);
+  return Buffer.from(b64, "base64").toString("utf-8");
 }
 
 /**

@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { Memory } from "@/lib/types";
+import { encodePath } from "@/lib/encode";
 import { formatRelative } from "@/lib/format";
 import { DataPanel } from "./DataPanel";
 
@@ -67,8 +69,9 @@ export function MemoryPanel({ memories }: MemoryPanelProps) {
         return [
           <GroupHeader key={`header-${type}`} label={TYPE_LABELS[type]} count={group.length} />,
           ...group.map((m) => (
-            <div
+            <Link
               key={m.path}
+              href={`/memory/${encodePath(m.path)}`}
               className={`flex items-start gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50${m.isIndex ? " bg-amber-50/40 dark:bg-amber-950/20" : ""}`}
             >
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -92,7 +95,7 @@ export function MemoryPanel({ memories }: MemoryPanelProps) {
               <div className="shrink-0 text-xs text-zinc-400">
                 {formatRelative(m.mtime)}
               </div>
-            </div>
+            </Link>
           )),
         ];
       })}
