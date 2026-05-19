@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { resolveProject, tildify } from "@/lib/paths";
+import { resolveProject } from "@/lib/paths";
 import { encodePath } from "@/lib/encode";
 import { scanClaudeMd } from "@/lib/scan/claudeMd";
 import { scanSkills } from "@/lib/scan/skills";
@@ -11,8 +11,7 @@ import { scanHooks } from "@/lib/scan/hooks";
 import { scanSettings } from "@/lib/scan/settings";
 import { listProjects } from "@/lib/scan/projects";
 import { runAllChecks } from "@/lib/health/checks";
-import { ProjectSwitcher } from "@/components/ProjectSwitcher";
-import { HealthSummaryLink } from "@/components/HealthSummaryLink";
+import { HeroCard } from "@/components/HeroCard";
 import { TabbedContent } from "@/components/TabbedContent";
 import { VALID_TABS, type TabId } from "@/components/TabBar";
 
@@ -68,22 +67,12 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Claude Code Setup
-          </h1>
-          <p className="mt-1 font-mono text-xs text-zinc-500">
-            {tildify(absolute)}
-          </p>
-          <Suspense fallback={null}>
-            <HealthSummaryLink checks={healthChecks} projectEncoded={encoded} />
-          </Suspense>
-        </div>
-        <Suspense fallback={null}>
-          <ProjectSwitcher projects={projects} currentEncoded={encoded} />
-        </Suspense>
-      </header>
+      <HeroCard
+        absolute={absolute}
+        encoded={encoded}
+        healthChecks={healthChecks}
+        projects={projects}
+      />
 
       <Suspense fallback={null}>
         <TabbedContent
